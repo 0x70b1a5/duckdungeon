@@ -66,8 +66,27 @@ impl Algorithm2D for Map {
     fn in_bounds(&self, point: Point) -> bool {
         self.in_bounds(point)
     }
+}
 
-    fn get_tile(&self, point: Point) -> Option<TileType> {
-        self.get_tile(point)
+impl BaseMap for Map {
+    fn get_available_exits(&self, idx: usize) -> SmallVec<[(usize, f32); 10]> {
+        let mut exits = SmallVec::new();
+        let location = self.index_to_point2d(idx);
+        for (dx, dy) in [
+            (-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)
+        ] {
+            if let Some(destination) = self.valid_exit(location, Point::new(dx, dy)) {
+                let cost = if dx != 0 && dy != 0 { 1.41 } else { 1.0 };
+                exits.push((destination, cost));
+            }
+        }
+        exits
+    }
+
+    fn get_pathing_distance(&self, start: usize, end: usize) -> f32 {
+        DistanceAlg::Pythagoras.distance2d(
+            self.index_to_point2d(start),
+            self.index_to_point2d(end)
+        )
     }
 }
