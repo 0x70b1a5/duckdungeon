@@ -1,25 +1,43 @@
 use crate::prelude::*;
+mod empty;
+use empty::EmptyArchitect;
 
-const NUM_ROOMS: usize = 33;
+trait MapArchitect {
+    fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
+}
+
+const NUM_ROOMS: usize = 3;
 
 pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
     pub player_start: Point,
+    pub amulet_start: Point,
+    pub monster_spawns: Vec<Point>,
 }
 
 impl MapBuilder {
     pub fn new(rng: &mut RandomNumberGenerator) -> Self {
-        let mut mb = MapBuilder {
-            map: Map::new(),
-            rooms: Vec::new(),
-            player_start: Point::new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2),
-        };
-        mb.fill(TileType::Wall);
-        mb.build_random_rooms(rng);
-        mb.build_corridors(rng);
-        mb.player_start = mb.rooms[0].center();
-        mb
+        let mut architect = EmptyArchitect{};
+        architect.new(rng)
+    }
+
+
+    fn find_most_distant(&self) -> Point {
+        let djikstra_map = DijkstraMap::new(
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            &vec![self.map.point2d_to_index(self.player_start)],
+            &self.map,
+            1024.0
+        );
+
+        const UNREACHABLE: &f32 = &f32::MAX;
+        self.map.index_to_point2d(
+            djikstra_map.map.iter().enumerate().filter(|(_, dist)| *dist < UNREACHABLE)
+            .max_by(|a,b| a.1.partial_cmp(b.1).unwrap())
+            .unwrap().0
+        )
     }
 
     fn fill(&mut self, tile: TileType) {

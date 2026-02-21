@@ -14,7 +14,7 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
     victims.iter().for_each(|(message, victim)| {
         let is_player = ecs.entry_ref(*victim).unwrap().get_component::<Player>().is_ok();
 
-        if let Ok(mut health) = ecs
+        if let Ok(health) = ecs
             .entry_mut(*victim)
             .unwrap()
             .get_component_mut::<Health>()

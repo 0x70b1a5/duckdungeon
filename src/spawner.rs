@@ -12,6 +12,7 @@ pub fn spawn_player(ecs: &mut World, pos: Point) {
             current: 10,
             max: 10,
         },
+        FieldOfView::new(8),
     ));
 }
 
@@ -38,6 +39,7 @@ pub fn spawn_monster(
             max: hp,
         },
         Name(name),
+        FieldOfView::new(6),
     ));
 }
 
@@ -46,4 +48,16 @@ fn goblin() -> (i32, String, FontCharType) {
 }
 fn orc() -> (i32, String, FontCharType) {
     (2, "Orc".to_string(), to_cp437('o'))
+}
+
+pub fn spawn_amulet_of_yala(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item, DuckingtonAmulet,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('|'),
+        },
+        Name("Duckington Amulet".to_string()),
+    ));
 }
