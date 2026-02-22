@@ -5,11 +5,13 @@ mod empty;
 use empty::EmptyArchitect;
 mod rooms;
 use rooms::RoomsArchitect;
+mod drunkard;
+use rooms::DrunkardsWalkArchitect;
 
 trait MapArchitect {
     fn new(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
 }
-
+(
 const NUM_ROOMS: usize = 3;
 
 pub struct MapBuilder {
